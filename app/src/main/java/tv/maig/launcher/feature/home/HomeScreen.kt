@@ -1,27 +1,22 @@
 package tv.maig.launcher.feature.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
-import tv.maig.launcher.ui.components.Screen
+import tv.maig.launcher.ui.components.AppGrid
 
 @Composable
-fun HomeScreen() {
-    Screen {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                "MaigTV",
-                textAlign = TextAlign.Center
-            )
-        }
+fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+    val context = LocalContext.current
+
+    val apps by viewModel.apps.collectAsState()
+
+    AppGrid(apps = apps) { app ->
+        viewModel.launchApp(context, app)
     }
 }
 
