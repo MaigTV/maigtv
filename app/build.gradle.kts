@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "in.maigtv.MaigTV"
+    namespace = "tv.maig.launcher"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "in.maigtv.MaigTV"
+        applicationId = "tv.maig.launcher"
         minSdk = 28
         targetSdk = 37
         versionCode = 1

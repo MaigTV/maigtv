@@ -1,4 +1,4 @@
-package `in`.maigtv.MaigTV
+package tv.maig.launcher
 
 import org.junit.Test
 
