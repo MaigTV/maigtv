@@ -38,16 +38,26 @@ android {
 }
 
 dependencies {
+    // core
     implementation(libs.androidx.core.ktx)
+
+    // ui
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.tv.material)
-    implementation(libs.coil.compose)
+
+    // activity
+    implementation(libs.androidx.activity.compose)
+
+    // lifecycle
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
