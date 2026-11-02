@@ -1,4 +1,4 @@
-package tv.maig.launcher.core.repositories
+package tv.maig.launcher.core.repository
 
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import tv.maig.launcher.models.AppInfo
+import tv.maig.launcher.core.model.AppInfo
 
 class AppRepository(private val context: Context) {
     suspend fun getInstalledApps(): List<AppInfo> = withContext(Dispatchers.IO) {

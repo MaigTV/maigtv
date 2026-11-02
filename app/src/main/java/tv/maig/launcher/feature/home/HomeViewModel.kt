@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import tv.maig.launcher.core.repositories.AppRepository
-import tv.maig.launcher.models.AppInfo
+import tv.maig.launcher.core.repository.AppRepository
+import tv.maig.launcher.core.model.AppInfo
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val appRepository: AppRepository = AppRepository(application.applicationContext)

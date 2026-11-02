@@ -1,4 +1,4 @@
-package tv.maig.launcher.ui.components
+package tv.maig.launcher.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CompactCard
 import androidx.tv.material3.Text
-import tv.maig.launcher.models.AppInfo
+import tv.maig.launcher.core.model.AppInfo
 
 @Composable
 fun AppGrid(apps: List<AppInfo>, onAppClick: (AppInfo) -> Unit) {

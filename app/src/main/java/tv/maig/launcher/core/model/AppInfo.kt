@@ -1,7 +1,6 @@
-package tv.maig.launcher.models
+package tv.maig.launcher.core.model
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import androidx.compose.ui.graphics.ImageBitmap
 
 data class AppInfo(

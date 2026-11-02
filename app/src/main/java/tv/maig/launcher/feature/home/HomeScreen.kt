@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.MaterialTheme
-import tv.maig.launcher.ui.components.AppGrid
+import tv.maig.launcher.ui.component.AppGrid
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = viewModel()) {

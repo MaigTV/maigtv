@@ -1,4 +1,4 @@
-package tv.maig.launcher.ui.components
+package tv.maig.launcher.ui.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
