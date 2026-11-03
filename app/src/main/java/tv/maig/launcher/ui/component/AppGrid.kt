@@ -11,8 +11,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import androidx.tv.material3.CompactCard
 import androidx.tv.material3.Text
 import tv.maig.launcher.core.model.AppInfo
@@ -20,7 +22,7 @@ import tv.maig.launcher.core.model.AppInfo
 @Composable
 fun AppGrid(apps: List<AppInfo>, onAppClick: (AppInfo) -> Unit) {
     LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
+        columns = GridCells.Fixed(4),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -30,22 +32,19 @@ fun AppGrid(apps: List<AppInfo>, onAppClick: (AppInfo) -> Unit) {
                 onClick = { onAppClick(app) },
                 title = { Text(app.label) },
                 image = {
-                    val imageBitmap = remember(app.packageName) {
-                        app.banner ?: app.icon
-                    }
+                    val icon = remember(app) { app.icon?.toBitmap()?.asImageBitmap() }
 
-                    if (imageBitmap != null) {
+                    if (icon != null) {
                         Image(
-                            bitmap = imageBitmap,
+                            bitmap = icon,
                             contentDescription = app.label,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .aspectRatio(16f / 9f)
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
                         )
                     }
-
-                }
+                },
             )
         }
     }

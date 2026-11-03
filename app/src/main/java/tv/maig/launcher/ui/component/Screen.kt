@@ -33,7 +33,7 @@ private fun ScreenPreview() {
     MaterialTheme {
         Screen {
             Box(
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = "Screen Preview",

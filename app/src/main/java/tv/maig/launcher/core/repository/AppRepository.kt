@@ -1,98 +1,102 @@
 package tv.maig.launcher.core.repository
 
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.graphics.Bitmap
-import android.graphics.Bitmap.createBitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.os.Build
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import android.content.pm.LauncherApps
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
+import android.os.UserHandle
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import tv.maig.launcher.core.model.AppInfo
+import kotlin.time.Duration.Companion.milliseconds
 
-class AppRepository(private val context: Context) {
-    suspend fun getInstalledApps(): List<AppInfo> = withContext(Dispatchers.IO) {
-        val pm = context.packageManager
-        val maigPkgName = context.packageName
+interface InstalledAppsRepository {
+    suspend fun getInstalledApp(): List<AppInfo>
 
-        val leanbackIntent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
+    fun observeInstalledApps(): Flow<List<AppInfo>>
+}
+
+interface AppLauncher {
+    fun launchApp(app: AppInfo)
+}
+
+class AppRepository(private val context: Context) :
+    InstalledAppsRepository,
+    AppLauncher {
+    private val launcherApps = context.getSystemService(LauncherApps::class.java)
+    private val user = Process.myUserHandle()
+
+    override fun launchApp(app: AppInfo) {
+        try {
+            launcherApps.startMainActivity(
+                app.componentName,
+                user,
+                null,
+                null,
+            )
+        } catch (_: SecurityException) {
+            // Ignore
         }
-        val launcherIntent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-        }
+    }
 
-        val leanbackApps = getIntentApps(leanbackIntent, pm)
-        val launcherApps = getIntentApps(launcherIntent, pm)
-
-        val combinedApps = (leanbackApps + launcherApps)
-            .filter {
-                it.activityInfo.packageName != maigPkgName
-            }
-            .distinctBy {
-                it.activityInfo.packageName
-            }
-
-        combinedApps
-            .mapNotNull { resolveInfo ->
-                val packageName = resolveInfo.activityInfo.packageName
-                val label = resolveInfo.loadLabel(pm).toString()
-
-                val launchIntent =
-                    pm.getLeanbackLaunchIntentForPackage(packageName)
-                        ?: pm.getLaunchIntentForPackage(packageName)
-
-                if (launchIntent == null) return@mapNotNull null
-
-                val iconDrawable = resolveInfo.loadIcon(pm)
-                val bannerDrawable = resolveInfo.activityInfo.loadBanner(pm)
-
+    override suspend fun getInstalledApp(): List<AppInfo> = withContext(Dispatchers.IO) {
+        launcherApps.getActivityList(null, user)
+            .distinctBy { it.componentName.packageName }
+            .filter { it.componentName.packageName != context.packageName }
+            .map { info ->
                 AppInfo(
-                    packageName = packageName,
-                    label = label,
-                    icon = iconDrawable?.toImageBitmap(),
-                    banner = bannerDrawable?.toImageBitmap(),
-                    launchIntent = launchIntent
+                    packageName = info.componentName.packageName,
+                    componentName = info.componentName,
+                    label = info.label.toString(),
+                    icon = info.getIcon(context.resources.displayMetrics.densityDpi),
                 )
             }
             .sortedBy { it.label.lowercase() }
     }
 
-    private fun getIntentApps(
-        intent: Intent,
-        pm: PackageManager,
-        flags: Int = 0
-    ): List<ResolveInfo> {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return pm.queryIntentActivities(
-                intent,
-                PackageManager.ResolveInfoFlags.of(flags.toLong())
-            )
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    override fun observeInstalledApps(): Flow<List<AppInfo>> = callbackFlow {
+        val refreshSignal: () -> Unit = { trySend(Unit) }
+        val callback = object : LauncherApps.Callback() {
+            override fun onPackageAdded(packageName: String, user: UserHandle) = refreshSignal()
+            override fun onPackageRemoved(packageName: String, user: UserHandle) = refreshSignal()
+            override fun onPackageChanged(packageName: String, user: UserHandle) = refreshSignal()
+
+            override fun onPackagesAvailable(
+                packageNames: Array<out String>,
+                user: UserHandle,
+                replacing: Boolean,
+            ) = refreshSignal()
+
+            override fun onPackagesUnavailable(
+                packageNames: Array<out String>,
+                user: UserHandle,
+                replacing: Boolean,
+            ) = refreshSignal()
+
+            override fun onPackagesSuspended(
+                packageNames: Array<out String>,
+                user: UserHandle,
+            ) = refreshSignal()
+
+            override fun onPackagesUnsuspended(
+                packageNames: Array<out String>,
+                user: UserHandle,
+            ) = refreshSignal()
         }
 
-        return pm.queryIntentActivities(intent, flags)
+        launcherApps.registerCallback(callback, Handler(Looper.getMainLooper()))
+        refreshSignal()
+        awaitClose { launcherApps.unregisterCallback(callback) }
     }
-
-    private fun Drawable.toImageBitmap(): ImageBitmap? {
-        return try {
-            if (this is BitmapDrawable && this.bitmap != null) {
-                return this.bitmap.asImageBitmap()
-            }
-            val width = if (intrinsicWidth > 0) intrinsicWidth else 128
-            val height = if (intrinsicHeight > 0) intrinsicHeight else 128
-            val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            setBounds(0, 0, canvas.width, canvas.height)
-            draw(canvas)
-            bitmap.asImageBitmap()
-        } catch (e: Exception) {
-            null
-        }
-    }
+        .debounce(150.milliseconds)
+        .mapLatest { getInstalledApp() }
 }

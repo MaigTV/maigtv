@@ -1,22 +1,36 @@
 package tv.maig.launcher.feature.home
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Text
+import tv.maig.launcher.core.model.AppInfo
+import tv.maig.launcher.feature.home.HomeUiState.Loading
 import tv.maig.launcher.ui.component.AppGrid
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
-    val context = LocalContext.current
+fun HomeScreen(viewModel: HomeViewModel) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    HomeScreen(uiState, onAppClick = viewModel::launchApp)
+}
 
-    val apps by viewModel.apps.collectAsState()
+@Composable
+fun HomeScreen(uiState: HomeUiState, onAppClick: (AppInfo) -> Unit) {
+    when (uiState) {
+        Loading -> Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(text = "MaigTV")
+        }
 
-    AppGrid(apps = apps) { app ->
-        viewModel.launchApp(context, app)
+        is HomeUiState.Content -> AppGrid(uiState.apps, onAppClick = onAppClick)
     }
 }
 
@@ -24,6 +38,6 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
 @Composable
 fun HomeScreenPreview() {
     MaterialTheme {
-        HomeScreen()
+        HomeScreen(uiState = Loading, onAppClick = {})
     }
 }

@@ -1,12 +1,13 @@
 package tv.maig.launcher.core.model
 
-import android.content.Intent
-import androidx.compose.ui.graphics.ImageBitmap
+import android.content.ComponentName
+import android.graphics.drawable.Drawable
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class AppInfo(
     val packageName: String,
+    val componentName: ComponentName,
     val label: String,
-    val icon: ImageBitmap?,
-    val banner: ImageBitmap?,
-    val launchIntent: Intent?
+    val icon: Drawable?,
 )
