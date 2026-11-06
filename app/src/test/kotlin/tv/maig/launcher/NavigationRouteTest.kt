@@ -18,8 +18,8 @@ class NavigationRouteTest {
   }
 
   @Test
-  fun resolve_returnsDetailsWhenDeepLinkMatches() {
-    val route = NavigationRouteResolver.resolve("maigtv://details/settings")
-    assertEquals(Details("settings"), route)
+  fun resolve_returnsSettingsWhenDeepLinkMatches() {
+    val route = NavigationRouteResolver.resolve("maigtv://settings")
+    assertEquals(Settings, route)
   }
 }

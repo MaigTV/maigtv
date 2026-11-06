@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +40,11 @@ fun MainNavigation(
         entry<Main> {
           MainScreen(
             dataRepository = dataRepository,
-            onItemClick = { navKey -> backStack.add(navKey) }
+            onSettingsClick = { backStack.add(Settings) }
           )
         }
-        entry<Details> { details ->
-          DetailsScreen(
-            itemId = details.itemId,
+        entry<Settings> {
+          SettingsScreen(
             onBack = { backStack.removeLastOrNull() }
           )
         }
@@ -50,13 +52,24 @@ fun MainNavigation(
   )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsScreen(
-  itemId: String,
+fun SettingsScreen(
   onBack: () -> Unit,
   modifier: Modifier = Modifier
 ) {
-  Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+  Scaffold(
+    modifier = modifier.fillMaxSize(),
+    topBar = {
+      CenterAlignedTopAppBar(
+        title = { Text("Settings") },
+        colors = TopAppBarDefaults.topAppBarColors(
+          containerColor = MaterialTheme.colorScheme.primaryContainer,
+          titleContentColor = MaterialTheme.colorScheme.primary
+        )
+      )
+    }
+  ) { innerPadding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -66,13 +79,17 @@ fun DetailsScreen(
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Text(
-        text = "Details: $itemId",
-        style = MaterialTheme.typography.headlineMedium
+        text = "Launcher Preferences",
+        style = MaterialTheme.typography.titleLarge
+      )
+      Text(
+        text = "Configure app grid density, hidden packages, and TV display options.",
+        style = MaterialTheme.typography.bodyMedium
       )
       Button(
         modifier = Modifier
           .defaultMinSize(minHeight = 48.dp)
-          .semantics { contentDescription = "Back to Home" },
+          .semantics { contentDescription = "Back to Home Screen" },
         onClick = onBack
       ) {
         Text("Back to Home")

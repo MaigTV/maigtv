@@ -14,7 +14,7 @@ app/
 │   └── kotlin/tv/maig/launcher/
 │       ├── MainActivity.kt          # Composition root & deep-link route resolution
 │       ├── Navigation.kt            # Navigation 3 NavDisplay & TV screen routing
-│       ├── NavigationKeys.kt        # Typed navigation keys (Main, Details)
+│       ├── NavigationKeys.kt        # Typed navigation keys (Main, Settings)
 │       ├── data/
 │       │   └── DataRepository.kt    # Seam: DataRepository, DefaultDataRepository, FakeDataRepository
 │       └── ui/
@@ -27,7 +27,7 @@ app/
 │               └── Type.kt          # 10-foot scale typography
 └── src/test/
     └── kotlin/tv/maig/launcher/
-        ├── NavigationRouteTest.kt   # Deep link and route resolution unit test
+        ├── NavigationRouteTest.kt   # Deep link (maigtv://settings) & route resolution unit test
         └── ui/main/
             └── MainScreenViewModelTest.kt # StateFlow pipeline test with FakeDataRepository
 ```

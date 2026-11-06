@@ -27,7 +27,7 @@ app/
 │   └── kotlin/tv/maig/launcher/
 │       ├── MainActivity.kt          # Composition root & deep-link route resolution
 │       ├── Navigation.kt            # Navigation 3 NavDisplay & TV screen routing
-│       ├── NavigationKeys.kt        # Typed navigation keys (Main, Details)
+│       ├── NavigationKeys.kt        # Typed navigation keys (Main, Settings)
 │       ├── data/
 │       │   └── DataRepository.kt    # Seam: DataRepository, DefaultDataRepository, FakeDataRepository
 │       └── ui/

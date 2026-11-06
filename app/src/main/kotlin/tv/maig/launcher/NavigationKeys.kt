@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object Main : NavKey
 
-@Serializable data class Details(val itemId: String) : NavKey
+@Serializable data object Settings : NavKey
+
 

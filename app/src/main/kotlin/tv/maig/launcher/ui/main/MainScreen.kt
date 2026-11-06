@@ -25,17 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavKey
-import tv.maig.launcher.Details
 import tv.maig.launcher.R
 import tv.maig.launcher.data.DataRepository
-import tv.maig.launcher.data.DefaultDataRepository
 import tv.maig.launcher.ui.theme.MaigTVTheme
 
 @Composable
 fun MainScreen(
   dataRepository: DataRepository,
-  onItemClick: (NavKey) -> Unit,
+  onSettingsClick: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(dataRepository) },
 ) {
@@ -52,7 +49,7 @@ fun MainScreen(
     is MainScreenUiState.Success -> {
       MainScreen(
         data = state.data,
-        onItemClick = onItemClick,
+        onSettingsClick = onSettingsClick,
         modifier = modifier
       )
     }
@@ -71,7 +68,7 @@ fun MainScreen(
 @Composable
 internal fun MainScreen(
   data: List<String>,
-  onItemClick: (NavKey) -> Unit = {},
+  onSettingsClick: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   Scaffold(
@@ -79,6 +76,16 @@ internal fun MainScreen(
     topBar = {
       CenterAlignedTopAppBar(
         title = { Text(stringResource(R.string.app_name)) },
+        actions = {
+          Button(
+            modifier = Modifier
+              .defaultMinSize(minHeight = 48.dp)
+              .semantics { contentDescription = "Open Settings" },
+            onClick = onSettingsClick
+          ) {
+            Text("Settings")
+          }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
           containerColor = MaterialTheme.colorScheme.primaryContainer,
           titleContentColor = MaterialTheme.colorScheme.primary
@@ -98,7 +105,7 @@ internal fun MainScreen(
           modifier = Modifier
             .defaultMinSize(minHeight = 48.dp)
             .semantics { contentDescription = "Launch $item" },
-          onClick = { onItemClick(Details(item)) }
+          onClick = { /* Launch app */ }
         ) {
           Text(text = item, style = MaterialTheme.typography.bodyLarge)
         }

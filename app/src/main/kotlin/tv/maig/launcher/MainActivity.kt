@@ -38,9 +38,8 @@ class MainActivity : ComponentActivity() {
 object NavigationRouteResolver {
   fun resolve(uriString: String?): NavKey {
     if (uriString == null) return Main
-    return if (uriString.startsWith("maigtv://details/")) {
-      val itemId = uriString.removePrefix("maigtv://details/")
-      Details(itemId.ifEmpty { "default" })
+    return if (uriString == "maigtv://settings" || uriString.startsWith("maigtv://settings/")) {
+      Settings
     } else {
       Main
     }
