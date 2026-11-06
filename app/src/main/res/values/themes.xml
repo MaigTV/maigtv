@@ -1,6 +1,0 @@
-<resources>
-    <!-- Base application theme. -->
-    <style name="Theme.MaigTV" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@android:color/black</item>
-    </style>
-</resources>
