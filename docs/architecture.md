@@ -78,7 +78,7 @@ Dependencies are managed via Gradle Version Catalog (`gradle/libs.versions.toml`
 
 | Library / Plugin | Version | Purpose |
 | :--- | :--- | :--- |
-| `com.android.application` | `9.0.1` | Android Gradle Plugin for compiling application |
+| `com.android.application` | `9.5.1` | Android Gradle Plugin for compiling application |
 | `org.jetbrains.kotlin.android` | `2.3.20` | Kotlin language compiler and runtime |
 | `androidx.compose.bom` | `2026.03.01` | Bill of Materials for Compose runtime, UI, and foundation |
 | `androidx.compose.material3` | BOM | Modern Material Design 3 components |

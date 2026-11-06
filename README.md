@@ -48,7 +48,7 @@ For full architectural contracts and module seams, see [docs/architecture.md](do
 
 - **Java Development Kit (JDK)**: JDK 17 or higher
 - **Android SDK**: `compileSdk = 37`, `minSdk = 28`
-- **Build System**: Gradle 9.1 with Android Gradle Plugin 9.0.1
+- **Build System**: Gradle 9.6 with Android Gradle Plugin 9.5.1
 
 ---
 
