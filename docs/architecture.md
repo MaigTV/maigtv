@@ -1,7 +1,29 @@
 # MaigTV Architecture
 
 ## Overview
-MaigTV is a lightweight, ad-free native launcher designed for TV form factors across Android TV, Google TV, and Amazon Fire OS. It adheres strictly to the single source of truth principle, unidirectional data flow, constructor-injected seams, and 10-foot TV accessibility guidelines.
+MaigTV is an ad-free, living-room OS-style interface designed for TV form factors across Android TV, Google TV, and Amazon Fire OS. Rather than functioning as a standard single-grid launcher, MaigTV is architected as an intuitive, multi-workspace living-room experience inspired by desktop window managers and virtual workspaces, purpose-built for 10-foot remote D-pad navigation.
+
+It adheres strictly to the single source of truth principle, unidirectional data flow, constructor-injected seams, and TV accessibility guidelines.
+
+---
+
+## Workspace Model
+
+The user experience is structured around fluid, horizontal or switchable **Workspaces**:
+
+```mermaid
+flowchart LR
+    subgraph Workspaces["Living-Room OS Workspaces"]
+        WS1["<b>Workspace 1: Dashboard Hub</b><br/>• Clock & Date<br/>• Quick-Launch Favorites<br/>• Continue Watching / Unfinished<br/>• Now-Playing Media Controls"]
+        WS2["<b>Workspace 2: Glanceable Intelligence</b><br/>• Multi-Day Weather Forecast<br/>• Air Quality Index (AQI)<br/>• Environmental & Ambient Status"]
+        WS3["<b>Workspace 3: App Library</b><br/>• All Installed TV Applications<br/>• Sideloaded App Drawer<br/>• Search & Categories"]
+    end
+    WS1 <--> WS2 <--> WS3
+```
+
+- **Workspace 1 (Dashboard Hub)**: The primary landing space for instantaneous utility — living-room clock, immediate resume/continue content, now-playing media card, and pinned favorite apps for zero-latency launching.
+- **Workspace 2 (Glanceable Intelligence)**: A dedicated utility space providing deeper situational awareness (expanded weather forecasts, AQI, calendar/ambient widgets) without cluttering the primary app drawer.
+- **Workspace 3 (App Library)**: A comprehensive, D-pad navigable catalog of all installed TV apps and sideloaded Android apps, powered by the reactive `AppRepository` seam.
 
 ---
 
@@ -46,9 +68,9 @@ flowchart TD
         MainNavigation["MainNavigation<br/>(NavDisplay + Typed Keys)"]
     end
 
-    subgraph UILayer["UI Layer"]
-        MainScreen["MainScreen<br/>(Stateless Composable)"]
-        MainViewModel["MainScreenViewModel<br/>(StateFlow UI State)"]
+    subgraph UILayer["UI Layer (Workspaces)"]
+        MainScreen["MainScreen / WorkspaceCoordinator<br/>(D-pad navigable workspace pager)"]
+        MainViewModel["MainScreenViewModel<br/>(StateFlow UI State: apps, widgets, active workspace)"]
     end
 
     subgraph DataLayer["Data Layer (Seam)"]
@@ -67,7 +89,7 @@ flowchart TD
 ```
 
 - **Composition Root (`MainActivity`)**: Instantiates concrete data repositories (`DefaultAppRepository`) at the system boundary and passes them into the composable tree via constructor injection. Resolves incoming deep-link intents into typed `NavKey` values.
-- **UI Layer (`ui/main`)**: Observes immutable `StateFlow` from `MainScreenViewModel`. The UI is stateless, receiving data and emitting callbacks (`onAppClick`). Every interactive component meets the 48dp minimum target size and provides accessibility semantics for remote D-pads.
+- **UI Layer (`ui/main`)**: Observes immutable `StateFlow` from `MainScreenViewModel`. The UI coordinates between workspaces, receiving data and emitting callbacks (`onAppClick`, `onWorkspaceSelect`). Every interactive component meets the 48dp minimum target size and provides accessibility semantics for remote D-pads.
 - **Data Layer (`data`)**: Defined behind `AppRepository`. Production code uses `DefaultAppRepository` (querying `PackageManager` for `CATEGORY_LEANBACK_LAUNCHER` and `CATEGORY_LAUNCHER`, and observing `LauncherApps.Callback` events), while unit tests and preview harnesses use `FakeAppRepository`. Domain contracts never depend on the UI framework.
 
 ---

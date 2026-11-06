@@ -54,3 +54,20 @@ For complete architectural details, see [docs/architecture.md](architecture.md).
 - **Rejected Alternatives:**
   - *`LauncherApps` alone:* Omitted native Leanback apps lacking mobile launcher entries.
   - *`PackageManager` with `BroadcastReceiver` alone:* Flaky background lifecycle handling, boiler-plate receiver wiring, and lacks multi-profile awareness.
+
+---
+
+## Decision: Evolution from Basic Launcher to Living-Room OS Experience (Workspaces Paradigm)
+
+- **Date:** 2026-11-07
+- **Status:** Agreed
+- **Request:** Pivot MaigTV from a basic, single-screen "cookie-cutter" app launcher into an OS-esque living-room interface organized around virtual workspaces (similar to a desktop window manager/workspace model, adapted for TV D-pad navigation).
+- **Choice:** Architect the user interface around fluid **Workspaces**:
+  1. **Workspace 1: Living-Room Dashboard / Hub**: Central overview including clock, quick-launch favorites, unfinished/continue watching content, now-playing media controls, and glanceable cards.
+  2. **Workspace 2: Deep Glanceable Intelligence**: Expanded utility view (e.g. multi-day weather forecast, air quality index (AQI), radar, calendar/schedule, ambient widgets).
+  3. **Workspace 3: App Library / Drawer**: Comprehensive searchable grid of all installed TV apps and sideloaded apps (powered by the existing `AppRepository`).
+  Additional spaces or modular views can be added or rearranged dynamically.
+- **Reason:** Conventional TV launchers are either ad-bloated promotional surfaces (stock Android TV/Fire OS) or simple, boring app grids. A multi-workspace OS paradigm provides substantial daily utility beyond launching apps, while remaining 100% ad-free, instant, and focused on clean remote D-pad ergonomics.
+- **Rejected Alternatives:**
+  - *Traditional single-grid launcher:* Rejected as commoditized and lacking living-room utility.
+  - *Monolithic vertically scrolling feed with sponsored channels:* Rejected because it recreates the bloat of stock Google TV and degrades responsiveness.

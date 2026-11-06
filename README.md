@@ -1,8 +1,8 @@
 # MaigTV
 
-A fast, ad-free, native launcher that replaces bloated stock TV home screens across Android TV, Google TV, and Amazon Fire OS devices.
+An ad-free, living-room OS-style experience that replaces bloated stock TV home screens with fluid virtual workspaces across Android TV, Google TV, and Amazon Fire OS devices.
 
-MaigTV is designed from the ground up for instantaneous 10-foot TV experiences: zero sponsored ads, zero background telemetry bloat, and pure responsive D-pad remote navigation.
+Rather than just another generic app grid, MaigTV is designed around modular **Workspaces** — a living-room dashboard hub (clock, quick launch, media continuation), an expanded glanceable intelligence space (weather, environmental data, ambient cards), and a dedicated app library — all crafted for instantaneous 10-foot remote D-pad navigation with zero ads and zero telemetry bloat.
 
 ---
 
