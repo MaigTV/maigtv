@@ -2,10 +2,41 @@
 
 ## Next
 
-- [ ] Query installed Leanback & Android applications via `PackageManager`.
 - [ ] Implement D-pad navigable TV grid layout with high-contrast focus rings.
-- [ ] Add app launching execution with security fallback guards.
 - [ ] Integrate Jetpack DataStore Preferences for pinned favorite applications.
+
+## Active
+
+### Query and Launch Installed Applications via AppRepository
+
+- **Status:** done
+- **Release:** 0.2.0
+- **Goal:** Provide a resilient, testable repository seam that queries installed Leanback and launcher applications via `PackageManager`, monitors package changes via `LauncherApps.Callback`, and securely launches selected apps.
+- **Requirements:**
+  - Query native TV applications matching `CATEGORY_LEANBACK_LAUNCHER`.
+  - Query sideloaded applications matching `CATEGORY_LAUNCHER` without duplicates.
+  - Exclude MaigTV launcher itself from the returned list.
+  - Observe real-time install, uninstall, and update events via `LauncherApps.Callback` in a reactive `callbackFlow`.
+  - Provide safe app launching prioritizing Leanback TV entry point before standard launcher intent.
+  - Retain full testability with `FakeAppRepository` running on JVM without framework mocks.
+- **Approach:** Introduce `TvAppInfo` model and `AppRepository` interface with `DefaultAppRepository` (production) and `FakeAppRepository` (tests/previews). Migrate `MainActivity`, `Navigation`, `MainScreenViewModel`, and `MainScreen` to consume `AppRepository`.
+- **Alternatives:**
+  - *Only `LauncherApps.getActivityList()`*: Rejected because it omits pure Android TV applications declaring only `CATEGORY_LEANBACK_LAUNCHER`.
+  - *Only `PackageManager` with BroadcastReceivers*: Rejected because broadcast receivers for package changes are clunky, not profile-aware, and subject to background execution limits.
+- **Sub-steps:**
+  - [x] Step 1: Declare package visibility `<queries>` in `AndroidManifest.xml`.
+  - [x] Step 2: Implement `TvAppInfo`, `AppRepository`, `DefaultAppRepository`, and `FakeAppRepository` in `tv.maig.launcher.data`.
+  - [x] Step 3: Update `MainScreenViewModel`, `MainScreenUiState`, and `MainScreen` to consume `AppRepository`.
+  - [x] Step 4: Wire `DefaultAppRepository` at composition root (`MainActivity` & `Navigation`).
+  - [x] Step 5: Update unit tests (`MainScreenViewModelTest`) and verify JVM test harness.
+  - [x] Step 6: Synchronize `docs/architecture.md` and `README.md`.
+  - [x] Step 7: Full gate verification (`./gradlew testDebugUnitTest assembleDebug`).
+- **Acceptance:**
+  - `AppRepository` interface has production `DefaultAppRepository` and testing `FakeAppRepository`.
+  - Unit tests run and pass without framework errors on JVM.
+  - Full gate `./gradlew testDebugUnitTest assembleDebug` succeeds.
+- **Docs:** `docs/architecture.md`, `README.md`, `docs/decisions.md`.
+- **Links:** `docs/decisions.md#decision-hybrid-appdiscovery-packagemanager-query-launcherappscallback`, `docs/architecture.md#seams-dependency-direction`.
 
 ## Done
 

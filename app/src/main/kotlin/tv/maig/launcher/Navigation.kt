@@ -22,12 +22,12 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import tv.maig.launcher.data.DataRepository
+import tv.maig.launcher.data.AppRepository
 import tv.maig.launcher.ui.main.MainScreen
 
 @Composable
 fun MainNavigation(
-  dataRepository: DataRepository,
+  appRepository: AppRepository,
   initialRoute: NavKey = Main
 ) {
   val backStack = rememberNavBackStack(initialRoute)
@@ -39,7 +39,7 @@ fun MainNavigation(
       entryProvider {
         entry<Main> {
           MainScreen(
-            dataRepository = dataRepository,
+            appRepository = appRepository,
             onSettingsClick = { backStack.add(Settings) }
           )
         }

@@ -41,3 +41,16 @@ MaigTV follows a single-activity architecture where `MainActivity` is declared i
 The UI layer is built with Jetpack Compose for TV, organizing installed apps into an accessible, D-pad navigable grid with smooth focus transitions, app banner/icon rendering, and instant launch actions. Layer boundaries strictly enforce that UI composables observe immutable `UiState`, domain interfaces remain free of Android UI framework dependencies, and repository implementations wrap system calls and package queries with failure-tolerant error handling.
 
 For complete architectural details, see [docs/architecture.md](architecture.md).
+
+---
+
+## Decision: Hybrid App Discovery (`PackageManager` Query + `LauncherApps.Callback`)
+
+- **Date:** 2026-11-06
+- **Status:** Agreed
+- **Request:** Determine whether to use `LauncherApps` or `PackageManager` to fetch and launch applications on Android TV, Google TV, and Amazon Fire OS.
+- **Choice:** Use `PackageManager` as the primary query engine to fetch TV applications (`CATEGORY_LEANBACK_LAUNCHER`) and sideloaded apps (`CATEGORY_LAUNCHER`), paired with `LauncherApps.Callback` to reactively observe package install, uninstall, and change events. Put this behind an `AppRepository` interface with `DefaultAppRepository` (production) and `FakeAppRepository` (JVM unit tests and Compose previews).
+- **Reason:** `LauncherApps.getActivityList()` is hardcoded in the Android framework to query only `CATEGORY_LAUNCHER`, which misses native Android TV apps that only declare `CATEGORY_LEANBACK_LAUNCHER`. However, `LauncherApps.Callback` is vastly superior to legacy `BroadcastReceiver`s for change notifications because it is profile-aware and unaffected by background broadcast limits.
+- **Rejected Alternatives:**
+  - *`LauncherApps` alone:* Omitted native Leanback apps lacking mobile launcher entries.
+  - *`PackageManager` with `BroadcastReceiver` alone:* Flaky background lifecycle handling, boiler-plate receiver wiring, and lacks multi-profile awareness.

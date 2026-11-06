@@ -9,12 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
-import tv.maig.launcher.data.DataRepository
-import tv.maig.launcher.data.DefaultDataRepository
+import tv.maig.launcher.data.AppRepository
+import tv.maig.launcher.data.DefaultAppRepository
 import tv.maig.launcher.ui.theme.MaigTVTheme
 
 class MainActivity : ComponentActivity() {
-  private val dataRepository: DataRepository by lazy { DefaultDataRepository() }
+  private val appRepository: AppRepository by lazy { DefaultAppRepository(applicationContext) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
     setContent {
       MaigTVTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          MainNavigation(dataRepository = dataRepository, initialRoute = initialRoute)
+          MainNavigation(appRepository = appRepository, initialRoute = initialRoute)
         }
       }
     }

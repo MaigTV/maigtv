@@ -23,13 +23,13 @@ The project follows clean, feature-first mobile conventions with constructor inj
 ```
 app/
 ├── src/main/
-│   ├── AndroidManifest.xml          # TV launcher, LEANBACK_LAUNCHER, HOME intent filters
+│   ├── AndroidManifest.xml          # TV launcher, LEANBACK_LAUNCHER, HOME intent filters, <queries>
 │   └── kotlin/tv/maig/launcher/
 │       ├── MainActivity.kt          # Composition root & deep-link route resolution
 │       ├── Navigation.kt            # Navigation 3 NavDisplay & TV screen routing
 │       ├── NavigationKeys.kt        # Typed navigation keys (Main, Settings)
 │       ├── data/
-│       │   └── DataRepository.kt    # Seam: DataRepository, DefaultDataRepository, FakeDataRepository
+│       │   └── AppRepository.kt     # Seam: TvAppInfo, AppRepository, DefaultAppRepository, FakeAppRepository
 │       └── ui/
 │           ├── main/
 │           │   ├── MainScreen.kt          # Stateless TV launcher composable with focus semantics

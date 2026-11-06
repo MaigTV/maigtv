@@ -10,13 +10,13 @@ MaigTV is a lightweight, ad-free native launcher designed for TV form factors ac
 ```
 app/
 ├── src/main/
-│   ├── AndroidManifest.xml          # TV launcher, LEANBACK_LAUNCHER, HOME intent filters
+│   ├── AndroidManifest.xml          # TV launcher, LEANBACK_LAUNCHER, HOME intent filters, <queries>
 │   └── kotlin/tv/maig/launcher/
 │       ├── MainActivity.kt          # Composition root & deep-link route resolution
 │       ├── Navigation.kt            # Navigation 3 NavDisplay & TV screen routing
 │       ├── NavigationKeys.kt        # Typed navigation keys (Main, Settings)
 │       ├── data/
-│       │   └── DataRepository.kt    # Seam: DataRepository, DefaultDataRepository, FakeDataRepository
+│       │   └── AppRepository.kt     # Seam: TvAppInfo, AppRepository, DefaultAppRepository, FakeAppRepository
 │       └── ui/
 │           ├── main/
 │           │   ├── MainScreen.kt          # Stateless TV launcher composable with focus semantics
@@ -29,7 +29,7 @@ app/
     └── kotlin/tv/maig/launcher/
         ├── NavigationRouteTest.kt   # Deep link (maigtv://settings) & route resolution unit test
         └── ui/main/
-            └── MainScreenViewModelTest.kt # StateFlow pipeline test with FakeDataRepository
+            └── MainScreenViewModelTest.kt # StateFlow pipeline test with FakeAppRepository
 ```
 
 ---
@@ -52,23 +52,23 @@ flowchart TD
     end
 
     subgraph DataLayer["Data Layer (Seam)"]
-        DataRepoInterface["DataRepository Interface"]
-        DefaultDataRepo["DefaultDataRepository"]
-        FakeDataRepo["FakeDataRepository"]
+        AppRepoInterface["AppRepository Interface"]
+        DefaultAppRepo["DefaultAppRepository<br/>(PackageManager + LauncherApps.Callback)"]
+        FakeAppRepo["FakeAppRepository<br/>(In-Memory Test Double)"]
     end
 
     MainActivity --> MainNavigation
-    MainActivity --> DefaultDataRepo
+    MainActivity --> DefaultAppRepo
     MainNavigation --> MainScreen
     MainScreen --> MainViewModel
-    MainViewModel --> DataRepoInterface
-    DefaultDataRepo -.implements.-> DataRepoInterface
-    FakeDataRepo -.implements.-> DataRepoInterface
+    MainViewModel --> AppRepoInterface
+    DefaultAppRepo -.implements.-> AppRepoInterface
+    FakeAppRepo -.implements.-> AppRepoInterface
 ```
 
-- **Composition Root (`MainActivity`)**: Instantiates concrete data repositories at the system boundary and passes them into the composable tree via constructor injection. Resolves incoming deep-link intents into typed `NavKey` values.
-- **UI Layer (`ui/main`)**: Observes immutable `StateFlow` from `MainScreenViewModel`. The UI is stateless, receiving data and emitting callbacks (`onItemClick`). Every interactive component meets the 48dp minimum target size and provides accessibility semantics for remote D-pads.
-- **Data Layer (`data`)**: Defined behind `DataRepository`. Production code uses `DefaultDataRepository`, while unit tests and preview harnesses use `FakeDataRepository`. Domain contracts never depend on the UI framework.
+- **Composition Root (`MainActivity`)**: Instantiates concrete data repositories (`DefaultAppRepository`) at the system boundary and passes them into the composable tree via constructor injection. Resolves incoming deep-link intents into typed `NavKey` values.
+- **UI Layer (`ui/main`)**: Observes immutable `StateFlow` from `MainScreenViewModel`. The UI is stateless, receiving data and emitting callbacks (`onAppClick`). Every interactive component meets the 48dp minimum target size and provides accessibility semantics for remote D-pads.
+- **Data Layer (`data`)**: Defined behind `AppRepository`. Production code uses `DefaultAppRepository` (querying `PackageManager` for `CATEGORY_LEANBACK_LAUNCHER` and `CATEGORY_LAUNCHER`, and observing `LauncherApps.Callback` events), while unit tests and preview harnesses use `FakeAppRepository`. Domain contracts never depend on the UI framework.
 
 ---
 

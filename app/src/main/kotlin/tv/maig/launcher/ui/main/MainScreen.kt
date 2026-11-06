@@ -26,15 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import tv.maig.launcher.R
-import tv.maig.launcher.data.DataRepository
+import tv.maig.launcher.data.AppRepository
+import tv.maig.launcher.data.TvAppInfo
 import tv.maig.launcher.ui.theme.MaigTVTheme
 
 @Composable
 fun MainScreen(
-  dataRepository: DataRepository,
+  appRepository: AppRepository,
   onSettingsClick: () -> Unit,
   modifier: Modifier = Modifier,
-  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(dataRepository) },
+  viewModel: MainScreenViewModel = viewModel { MainScreenViewModel(appRepository) },
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   when (val state = uiState) {
@@ -48,7 +49,8 @@ fun MainScreen(
     }
     is MainScreenUiState.Success -> {
       MainScreen(
-        data = state.data,
+        apps = state.apps,
+        onAppClick = { packageName -> viewModel.launchApp(packageName) },
         onSettingsClick = onSettingsClick,
         modifier = modifier
       )
@@ -67,9 +69,10 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainScreen(
-  data: List<String>,
+  apps: List<TvAppInfo>,
+  modifier: Modifier = Modifier,
+  onAppClick: (String) -> Unit = {},
   onSettingsClick: () -> Unit = {},
-  modifier: Modifier = Modifier
 ) {
   Scaffold(
     modifier = modifier,
@@ -100,14 +103,26 @@ internal fun MainScreen(
         .padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-      data.forEach { item ->
-        Button(
-          modifier = Modifier
-            .defaultMinSize(minHeight = 48.dp)
-            .semantics { contentDescription = "Launch $item" },
-          onClick = { /* Launch app */ }
+      if (apps.isEmpty()) {
+        Box(
+          modifier = Modifier.fillMaxSize(),
+          contentAlignment = Alignment.Center
         ) {
-          Text(text = item, style = MaterialTheme.typography.bodyLarge)
+          Text(
+            text = "No TV applications installed",
+            style = MaterialTheme.typography.bodyLarge
+          )
+        }
+      } else {
+        apps.forEach { app ->
+          Button(
+            modifier = Modifier
+              .defaultMinSize(minHeight = 48.dp)
+              .semantics { contentDescription = "Launch ${app.label}" },
+            onClick = { onAppClick(app.packageName) }
+          ) {
+            Text(text = app.label, style = MaterialTheme.typography.bodyLarge)
+          }
         }
       }
     }
@@ -118,7 +133,12 @@ internal fun MainScreen(
 @Composable
 fun MainScreenPreview() {
   MaigTVTheme {
-    MainScreen(data = listOf("Android TV", "Google TV", "Fire OS"))
+    MainScreen(
+      apps = listOf(
+        TvAppInfo("com.google.android.youtube.tv", "MainActivity", "YouTube"),
+        TvAppInfo("com.netflix.ninja", "MainActivity", "Netflix"),
+        TvAppInfo("com.amazon.amazonvideo.livingroom", "MainActivity", "Prime Video")
+      )
+    )
   }
 }
-
